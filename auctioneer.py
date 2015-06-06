@@ -115,7 +115,7 @@ for i in usersnsr.iterkeys():
 for i in usersnbtstore.iterkeys():
   usersnbt[i]=usersnbtstore[i]
 for i in usersnsrstore.iterkeys():
-  usersnsr[i]=usernsrstore[i]
+  usersnsr[i]=usersnsrstore[i]
 
 #Manysend Output
 outnbt = {}
