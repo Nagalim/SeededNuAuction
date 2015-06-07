@@ -41,7 +41,7 @@ except:
 if confirm > 0:
   print "Auction ended ",confirm," blocks ago"
 else:
-  print "Auction close beyond downloaded blockchain.  Will proceed wil all confirmed outputs"
+  print "Auction close beyond downloaded blockchain.  Will proceed with all confirmed outputs."
   confirm=1
 
 #Process unspent transactions
