@@ -24,16 +24,25 @@ try:
 except:
   print "could not connect to nsr daemon"
   sys.exit(1)
+try:
+  blkcnt = rpc.getblockcount()
+except:
+  print "Issues with RPC"
+  sys.exit(1)
 
 #Ask for Block Height of Auction Close
 try:
- endblk = input('Enter Block Height of Auction Close: ')
- blkcnt = rpc.getblockcount()
- confirm = blkcnt - endblk
- print "Auction ended ",confirm," blocks ago"
+  endblk = input('Enter Block Height of Auction Close: ')
+  confirm = blkcnt - endblk
+  print "Auction ended ",confirm," blocks ago"
 except:
- print "Please enter a 6 or 7 digit number like '384498'"
- sys.exit(1)
+  print "Please enter a 6 or 7 digit number like '384498'"
+  sys.exit(1)
+if confirm > 0:
+  print "Auction ended ",confirm," blocks ago"
+else:
+  print "Auction close beyond downloaded blockchain.  Will proceed wil all confirmed outputs"
+  confirm=1
 
 #Process unspent transactions
 receivednbt = rpc.listunspent(confirm)
@@ -62,7 +71,7 @@ for i in range(0,len(receivednbt)):
     usersnsr[pair[1]] = packet['amount']
     nbttotal = nbttotal + packet['amount']
    else:
-    print "More than one instance of ",addy," in addresses.txt"
+    print "More than one instance of",addy,"in addresses.txt"
     sys.exit(1)
   else:
    usersnbtstore[addy] = packet['amount']
@@ -89,7 +98,7 @@ for i in range(0,len(receivednsr)):
     usersnbt[pair[0]] = packet['amount']
     nsrtotal = nsrtotal + packet['amount']
    else:
-    print "More than one instance of ",addy," in addresses.txt"
+    print "More than one instance of",addy,"in addresses.txt"
     sys.exit(1)
   else:
    usersnsrstore[addy] = packet['amount']
