@@ -34,12 +34,11 @@ except:
 try:
   endblk = input('Enter Block Height of Auction Close: ')
   confirm = blkcnt - endblk
-  print "Auction ended ",confirm," blocks ago"
 except:
   print "Please enter a 6 or 7 digit number like '384498'"
   sys.exit(1)
 if confirm > 0:
-  print "Auction ended ",confirm," blocks ago"
+  print "Auction ended",confirm,"blocks ago"
 else:
   print "Auction close beyond downloaded blockchain.  Will proceed with all confirmed outputs."
   confirm=1
