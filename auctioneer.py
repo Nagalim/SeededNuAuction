@@ -112,25 +112,34 @@ for i in range(0,len(receivednsr)):
 #Totals and price
 print 'Total Nbt Received:',nbttotal
 print 'Total Nsr Received:',nsrtotal
-price = max(nbttotal,0.001) / max(nsrtotal,1)
+price = max(nbttotal,0.03) / max(nsrtotal,3)
+nbtprice = max(nbttotal-.02,0) / max(nsrtotal,1)
+nsrprice = max(nbttotal,0) / max(nsrtotal-2,1)
 print 'Auction Closing Price:',price,'NSR/NBT'
 
 #Payout and Sendback
 for i in usersnbt.iterkeys():
- usersnbt[i]=usersnbt[i]*price
+ usersnbt[i]=usersnbt[i]*nbtprice
 for i in usersnsr.iterkeys():
- usersnsr[i]=usersnsr[i]/price
+ usersnsr[i]=usersnsr[i]/nsrprice
 for i in usersnbtstore.iterkeys():
   usersnbt[i]=usersnbtstore[i]
 for i in usersnsrstore.iterkeys():
   usersnsr[i]=usersnsrstore[i]
 
+sumnbt=0
+sumnsr=0
+
 #Manysend Output
 outnbt = {}
 for addr in usersnbt:
   outnbt[addr] = float("%.8f" % usersnbt[addr])
+  sumnbt = sumnbt + usersnbt[addr]
 print jsonrpc.dumps(outnbt).replace(' ', '')
 outnsr = {}
 for addr in usersnsr:
   outnsr[addr] = float("%.8f" % usersnsr[addr])
+  sumnsr = sumnsr + usersnsr[addr]
 print jsonrpc.dumps(outnsr).replace(' ', '')
+print "Sum NBT to send:",sumnbt
+print "Sum NSR to send:",sumnsr
