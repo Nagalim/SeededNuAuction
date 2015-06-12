@@ -54,65 +54,101 @@ usersnbt = {}
 usersnsr = {}
 usersnbtstore = {}
 usersnsrstore = {}
+mynsr = (link[0])[1]
+mynbt = (link[0])[0]
+
 
 #Add addresses and amounts to the above initialed parameters for NBT deposits
 for i in range(0,len(receivednbt)):
  packet = receivednbt[i]
  txid=packet['txid']
- tx=rpc.gettransaction(txid)
- trim=tx['details'][0]
- addy = trim['address']
- indices = [i for i, s in enumerate(link) if addy in s]
- if not addy in usersnsr:
-  if indices != []:
-   if len(indices) == 1:
-    pair=link[indices[0]]
-    usersnsr[pair[1]] = packet['amount']
-    nbttotal = nbttotal + packet['amount']
+ tx=rpc.decoderawtransaction(rpc.getrawtransaction(txid))
+ negamt=0
+ for p in tx['vout']:
+  chaddy=p['scriptPubKey']['addresses'][0]
+  if chaddy != mynbt:
+   negamt=negamt + p['value']
+ addresses=[]
+ for j in tx['vin']:
+  input_raw_tx = rpc.decoderawtransaction(rpc.getrawtransaction(j['txid']))
+  addy=input_raw_tx['vout'][j['vout']]['scriptPubKey']['addresses'][0]  
+  amount=input_raw_tx['vout'][j['vout']]['value']
+  #print "NBT receive:",addy," ",amount
+  if negamt != 0:
+   if amount > negamt:
+    amount = amount - negamt
+    negamt = 0
    else:
-    print "More than one instance of",addy,"in addresses.txt"
-    sys.exit(1)
+    negamt = negamt - amount
+    amount = 0
+  indices = [i for i, s in enumerate(link) if addy in s]
+  if not addy in usersnsr:
+   if indices != []:
+    if len(indices) == 1:
+     pair=link[indices[0]]
+     usersnsr[pair[1]] = amount
+     nbttotal = nbttotal + amount
+    else:
+     print "More than one instance of",addy,"in addresses.txt"
+     sys.exit(1)
+   else:
+    usersnbtstore[addy] = amount
   else:
-   usersnbtstore[addy] = packet['amount']
- else:
-  if indices != []:
-   pair=link[indices[0]]
-   usersnsr[pair[1]] =  usersnsr[pair[1]] + packet['amount']
-   nbttotal = nbttotal + packet['amount']
-  else:
-   usersnbtstore[addy] =  usersnbtstore[addy] + packet['amount']
-
+   if indices != []:
+    pair=link[indices[0]]
+    usersnsr[pair[1]] =  usersnsr[pair[1]] + amount
+    nbttotal = nbttotal + amount
+   else:
+    usersnbtstore[addy] =  usersnbtstore[addy] + packet['amount']
+ 
 #Do the same with NSR deposits
 for i in range(0,len(receivednsr)):
  packet = receivednsr[i]
  txid=packet['txid']
- tx=nsrrpc.gettransaction(txid)
- trim=tx['details'][0]
- addy = trim['address']
- indices = [i for i, s in enumerate(link) if addy in s]
- if not addy in usersnbt:
-  if indices != []:
-   if len(indices) == 1:
+ tx=nsrrpc.decoderawtransaction(nsrrpc.getrawtransaction(txid))
+ negamt=0
+ for p in tx['vout']:
+  chaddy=p['scriptPubKey']['addresses'][0]
+  if chaddy != mynsr:
+   negamt=negamt + p['value']
+ addresses=[]
+ for j in tx['vin']:
+  input_raw_tx = nsrrpc.decoderawtransaction(nsrrpc.getrawtransaction(j['txid']))
+  addy=input_raw_tx['vout'][j['vout']]['scriptPubKey']['addresses'][0]
+  amount=input_raw_tx['vout'][j['vout']]['value']
+  #print "NSR receive:",addy," ",amount
+  if negamt != 0:
+   if amount > negamt:
+    amount = amount - negamt
+    negamt = 0
+   else:
+    negamt = negamt - amount
+    amount = 0
+  indices = [i for i, s in enumerate(link) if addy in s]
+  if not addy in usersnbt:
+   if indices != []:
+    if len(indices) == 1:
+     pair=link[indices[0]]
+     usersnbt[pair[0]] = amount
+     nsrtotal = nsrtotal + amount
+    else:
+     print "More than one instance of",addy,"in addresses.txt"
+     sys.exit(1)
+   else:
+    usersnsrstore[addy] = amount
+  else:
+   if indices != []:
     pair=link[indices[0]]
-    usersnbt[pair[0]] = packet['amount']
+    usersnbt[pair[0]] =  usersnbt[pair[0]] + packet['amount']
     nsrtotal = nsrtotal + packet['amount']
    else:
-    print "More than one instance of",addy,"in addresses.txt"
-    sys.exit(1)
-  else:
-   usersnsrstore[addy] = packet['amount']
- else:
-  if indices != []:
-   pair=link[indices[0]]
-   usersnbt[pair[0]] =  usersnbt[pair[0]] + packet['amount']
-   nsrtotal = nsrtotal + packet['amount']
-  else:
-   usersnsrstore[addy] =  usersnbtstore[addy] + packet['amount']
+    usersnsrstore[addy] =  usersnbtstore[addy] + packet['amount']
+
 
 #Totals and price
 print 'Total Nbt Received:',nbttotal
 print 'Total Nsr Received:',nsrtotal
-price = max(nbttotal,0.03) / max(nsrtotal,3)
+price = max(nbttotal,0.001) / max(nsrtotal,1)
 nbtprice = max(nbttotal-.02,0) / max(nsrtotal,1)
 nsrprice = max(nbttotal,0) / max(nsrtotal-2,1)
 print 'Auction Closing Price:',price,'NSR/NBT'
@@ -127,10 +163,9 @@ for i in usersnbtstore.iterkeys():
 for i in usersnsrstore.iterkeys():
   usersnsr[i]=usersnsrstore[i]
 
+#Manysend Output
 sumnbt=0
 sumnsr=0
-
-#Manysend Output
 outnbt = {}
 for addr in usersnbt:
   outnbt[addr] = float("%.8f" % usersnbt[addr])
@@ -143,3 +178,4 @@ for addr in usersnsr:
 print jsonrpc.dumps(outnsr).replace(' ', '')
 print "Sum NBT to send:",sumnbt
 print "Sum NSR to send:",sumnsr
+
