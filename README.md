@@ -1,13 +1,18 @@
 # SeededNuAuction
 A dual side, seedable auction protocol
 
+
 RPC operations take the auctioneer's wallet and process unspent transactions to find a common price.
 It then outputs the target of a manysend command to be verified and sent manually by the auctioneer.
 The target addresses are determined by pairs of NSR/NBT addresses ('links') in addresses.txt
 
+
 Price = NBT received / NSR received
+
 Each link receives funds:
+
 NBT sent = NSR received * Price
+
 NSR sent = NBT received / Price
 
 Participants provide both NSR and NBT in a ratio corresponding to their ideal NBT/NSR price point.
