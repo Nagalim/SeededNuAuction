@@ -20,7 +20,7 @@ nsrauc = 'SMNjMt4Wu2DKbDavbP6FyxA6nv4ZWgdGEP'
 nbtpar = ''
 nsrpar = ''
 
-# These are the auction parameters.  'out' is a volume in nbt and 'price' is a pricepoint.
+# These are the auction parameters.  volume is in units of nbt and 'price' is a NSR/NBT pricepoint.
 #   'pw' is your encrypted wallet password.  Please be careful saving this on your computer.
 volume  = 0.1
 price= 0.0022
