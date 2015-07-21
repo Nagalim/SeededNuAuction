@@ -105,7 +105,6 @@ confirm = 'n'
 confirm = raw_input('Are you sure you want to send:\n'+str({nbtauc:volume,nbtpar:changenbt})+'\n and \n'+str({nsrauc:nsrvolume,nsrpar:changensr})+'\n (Y/N)')
 
 if confirm == 'y' or confirm == 'Y':
-  rpc.walletpassphrase(pw,1)
   rpc.sendrawtransaction(nbttxsgn["hex"])
   nsrrpc.sendrawtransaction(nsrtxsgn["hex"])
 else:
