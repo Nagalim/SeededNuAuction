@@ -1,10 +1,10 @@
 # SeededNuAuction
-A dual side, seedable auction protocol
+## A dual side, seedable auction protocol
 
 To participate, read the config portion of participant.py and enter the appropriate information.
 
 
-
+----------------------------------------------------------------------------------------------
 
 Function and Method:
 
