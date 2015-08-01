@@ -35,6 +35,9 @@ pw = ''
 folder="APPDATA"
 #folder="HOME"
 
+# ADVANCED PARAMETERS
+# 'wait' causes the bot to submit next auction instead of this one.  It bypasses the noobswitch, so is considered advanced.
+wait = 'False'
 #---------------------------Begin---------------------------------#
 
 #Setting up RPC.
@@ -156,13 +159,18 @@ def poloniex_query():
 #Loop twice a minute
 noobswitch = 1
 if loop != 'once':
- switch=0
+ if wait == 'True':
+  switch=1
+  noobswitch=0
+ else:
+  switch=0
  while True:
   blkcnt = rpc.getblockcount()
-  if blkcnt%5000 > loop and switch==0:
+  if blkcnt%5000 >= loop and switch==0:
    participate(nbtauc,nsrauc,nbtpar,nsrpar,volume,price,pw,noobswitch)
    switch=1
+  if blkcnt%5000 < loop and switch==1:
+   switch=0
   time.sleep(30)
 else:
  participate(nbtauc,nsrauc,nbtpar,nsrpar,volume,price,pw,noobswitch)
-
